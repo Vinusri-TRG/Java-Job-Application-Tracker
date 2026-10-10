@@ -1,1 +1,15 @@
+
+
+# Java compiled files
 *.class
+
+# Environment and secret files
+.env
+.env.*
+!.env.example
+
+# IDE and operating system files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

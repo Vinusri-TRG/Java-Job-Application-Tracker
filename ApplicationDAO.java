@@ -72,6 +72,56 @@ public class ApplicationDAO {
         }
     }
 
+    // SEARCH APPLICATIONS BY COMPANY NAME OR JOB ROLE
+
+    public static void searchApplications(String keyword) {
+
+        String sql = "SELECT * FROM application " +
+                     "WHERE company_name LIKE ? OR jobrole LIKE ?";
+
+        try {
+
+            Connection con = DBConnection.getConnection();
+            PreparedStatement ps = con.prepareStatement(sql);
+
+            ps.setString(1, "%" + keyword + "%");
+            ps.setString(2, "%" + keyword + "%");
+
+            var rs = ps.executeQuery();
+
+            boolean found = false;
+
+            System.out.println("\n===== SEARCH RESULTS =====");
+
+            while (rs.next()) {
+
+                found = true;
+
+                System.out.println("ID: " + rs.getInt("id"));
+                System.out.println("Company: " + rs.getString("company_name"));
+                System.out.println("Job Role: " + rs.getString("jobrole"));
+                System.out.println("Application Date: " + rs.getString("application_date"));
+                System.out.println("Status: " + rs.getString("status"));
+                System.out.println("Interview Date: " + rs.getString("interview_date"));
+
+                System.out.println("-----------------------------");
+            }
+
+            if (!found) {
+                System.out.println("No matching applications found!");
+            }
+
+            rs.close();
+            ps.close();
+            con.close();
+
+        } catch (Exception e) {
+
+            System.out.println("Failed to search applications!");
+            e.printStackTrace();
+        }
+    }
+
     public static void updateStatus(int id, String newStatus,String newDate) {
 
         String sql = "UPDATE application SET status = ?,interview_date = ? WHERE id = ?";
@@ -132,4 +182,5 @@ public class ApplicationDAO {
             e.printStackTrace();
         }
     }
+
 }

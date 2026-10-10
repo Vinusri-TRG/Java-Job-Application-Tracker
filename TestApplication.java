@@ -9,15 +9,16 @@ public class TestApplication {
             System.out.println("===== JOB APPLICATION TRACKER =====");
             System.out.println("1. Add Application");
             System.out.println("2. View Applications");
-            System.out.println("3. Update Application");
-            System.out.println("4. Delete Application");
-            System.out.println("5. Exit");
+            System.out.println("3. Search Application");
+            System.out.println("4. Update Application");
+            System.out.println("5. Delete Application");
+            System.out.println("6. Exit");
 
             System.out.print("Enter your choice: ");
 
             if (!sc.hasNextInt()) {
 
-                System.out.println("Invalid input! Please enter a number from 1 to 5.");
+                System.out.println("Invalid input! Please enter a number from 1 to 6.");
 
                 sc.nextLine();
 
@@ -54,6 +55,15 @@ public class TestApplication {
                     break;
 
                 case 3:
+                    sc.nextLine();
+
+                    System.out.print("Enter company name or job role to search: ");
+                    String keyword = sc.nextLine();
+
+                    ApplicationDAO.searchApplications(keyword);
+                    break;
+
+                case 4:
                     System.out.print("Enter application ID: ");
 
                     if (!sc.hasNextInt()) {
@@ -78,7 +88,7 @@ public class TestApplication {
 
                     break;
                     
-                case 4:
+                case 5:
 
                     System.out.print("Enter application ID to delete: ");
                     int deleteId = sc.nextInt();
@@ -100,7 +110,7 @@ public class TestApplication {
 
                     break;
 
-                case 5:
+                case 6:
 
                     System.out.println("Thank you for using Job Application Tracker!");
                     sc.close();

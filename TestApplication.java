@@ -1,4 +1,8 @@
 import java.util.Scanner;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.time.format.ResolverStyle;
 
 public class TestApplication {
 
@@ -34,13 +38,31 @@ public class TestApplication {
                     String companyName = sc.nextLine();
                     System.out.print("Enter the Jobrole: ");
                     String jobRole = sc.nextLine();
-                    System.out.print("Enter the ApplicationDate: ");
+                    
+                    System.out.print("Enter the ApplicationDate (dd-MM-yyyy): ");
                     String application_date = sc.nextLine();
+
+                    if (!isValidDate(application_date)) {
+                        System.out.println("Invalid application date! Use dd-MM-yyyy, for example 15-01-2027.");
+                        break;
+                    }
+
                     System.out.print("Enter the Status: ");
                     String status = sc.nextLine();
-                    System.out.print("Enter the InterviewDate: "); 
+                    
+                    System.out.print("Enter the InterviewDate (dd-MM-yyyy, or press Enter if not scheduled): ");
                     String interview_date = sc.nextLine();
 
+                    if (!interview_date.trim().isEmpty() && !isValidDate(interview_date)) {
+                        System.out.println("Invalid interview date! Use dd-MM-yyyy, for example 20-01-2027.");
+                        break;
+                    }
+
+                    if(companyName.trim().isEmpty() || jobRole.trim().isEmpty() || application_date.trim().isEmpty()
+                     || status.trim().isEmpty()){
+                        System.out.println("Fill the requried details ");
+                        break;
+                    }
                     JobApplication application = new JobApplication(
                                         companyName,
                                         jobRole,
@@ -81,10 +103,21 @@ public class TestApplication {
 
                     System.out.print("Enter new status: ");
                     String newStatus = sc.nextLine();
-                    System.out.print("Enter new interview date : ");
+                   
+                    System.out.print("Enter new interview date (d-M-yyyy, or press Enter if not scheduled): ");
                     String newDate = sc.nextLine();
 
-                    ApplicationDAO.updateStatus(id, newStatus,newDate);
+                    if (!newDate.trim().isEmpty() && !isValidDate(newDate)) {
+                        System.out.println("Invalid interview date! Use d-M-yyyy, for example 8-11-2026.");
+                        break;
+                    }
+
+                    if (newStatus.trim().isEmpty()) {
+                        System.out.println("Status cannot be empty!");
+                        break;
+                    }
+
+                    ApplicationDAO.updateStatus(id, newStatus, newDate);
 
                     break;
                     
@@ -120,5 +153,19 @@ public class TestApplication {
                     System.out.println("Invalid choice!!!!!");
             }
         }
-    }           
+    } 
+    
+    public static boolean isValidDate(String date) {
+        DateTimeFormatter formatter =
+                DateTimeFormatter.ofPattern("dd-MM-uuuu")
+                        .withResolverStyle(ResolverStyle.STRICT);
+
+        try {
+            LocalDate.parse(date, formatter);
+            return true;
+        } catch (DateTimeParseException e) {
+            return false;
+        }
+    }
+          
 }

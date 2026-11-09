@@ -34,6 +34,20 @@ This project was initially developed as a Java console application using JDBC an
 - Maven
 - Git and GitHub
 
+## Project Screenshots
+
+### 1. Dashboard
+
+![Dashboard](screenshots/dashboard.png)
+
+### 2. Add Application
+
+![Add Application](screenshots/add-application.png)
+
+### 3. Edit Application
+
+![Edit Application](screenshots/edit-application.png)
+
 ## Database Details
 
 - Database: `jobtracker`

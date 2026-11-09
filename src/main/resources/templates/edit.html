@@ -1,0 +1,282 @@
+
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title>Edit Job Application</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 40px 15px;
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #dbeafe, #e9d5ff);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: auto;
+            background: white;
+            padding: 35px;
+            border-radius: 15px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+        }
+
+        h2 {
+            text-align: center;
+            color: #4338ca;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #777;
+            margin-bottom: 30px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 8px;
+            border: 1px solid #ccc;
+            border-radius: 7px;
+            font-size: 15px;
+            background: #fff;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: #6366f1;
+            box-shadow: 0 0 5px rgba(99,102,241,0.3);
+        }
+
+        .field {
+            margin-bottom: 18px;
+        }
+
+        .error {
+            color: #dc2626;
+            font-size: 13px;
+            display: block;
+            margin-top: 4px;
+        }
+
+        .buttons {
+            display: flex;
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        button, .cancel {
+            flex: 1;
+            padding: 13px;
+            border: none;
+            border-radius: 7px;
+            text-align: center;
+            font-size: 15px;
+            font-weight: bold;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        button {
+            background: #4f46e5;
+            color: white;
+        }
+
+        button:hover {
+            background: #3730a3;
+        }
+
+        .cancel {
+            background: #e5e7eb;
+            color: #333;
+        }
+
+        .cancel:hover {
+            background: #d1d5db;
+        }
+
+        @media (max-width: 500px) {
+            .container {
+                padding: 22px;
+            }
+
+            .buttons {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <h2>Edit Job Application</h2>
+    <p class="subtitle">Update your application details</p>
+
+    <form th:action="@{/applications/update/{id}(id=${applicationId})}"
+          th:object="${application}"
+          method="post">
+
+        <!-- Company Name -->
+        <div class="field">
+            <label>Company Name</label>
+
+            <input type="text"
+                   th:field="*{companyName}"
+                   placeholder="Enter company name"
+                   required>
+
+            <span class="error"
+                  th:if="${#fields.hasErrors('companyName')}"
+                  th:errors="*{companyName}"></span>
+        </div>
+
+        <!-- Job Role -->
+        <div class="field">
+            <label>Job Role</label>
+
+            <input type="text"
+                   th:field="*{jobRole}"
+                   placeholder="Enter job role"
+                   required>
+
+            <span class="error"
+                  th:if="${#fields.hasErrors('jobRole')}"
+                  th:errors="*{jobRole}"></span>
+        </div>
+
+        <!-- Application Date -->
+        <div class="field">
+            <label>Application Date</label>
+
+            <input type="date"
+                   th:field="*{applicationDate}"
+                   required>
+
+            <span class="error"
+                  th:if="${#fields.hasErrors('applicationDate')}"
+                  th:errors="*{applicationDate}"></span>
+        </div>
+
+        <!-- Application Status -->
+        <div class="field">
+            <label>Application Status</label>
+
+            <select th:field="*{status}" required>
+                <option value="Applied">Applied</option>
+                <option value="1st Round">1st Round</option>
+                <option value="2nd Round">2nd Round</option>
+                <option value="3rd Round">3rd Round</option>
+                <option value="4th Round">4th Round</option>
+                <option value="5th Round">5th Round</option>
+                <option value="Interview Scheduled">Interview Scheduled</option>
+                <option value="Selected">Selected</option>
+                <option value="Rejected">Rejected</option>
+            </select>
+
+            <span class="error"
+                  th:if="${#fields.hasErrors('status')}"
+                  th:errors="*{status}"></span>
+        </div>
+
+        <!-- Interview Status -->
+        <div class="field">
+            <label>Interview Schedule</label>
+
+            <select th:field="*{interviewStatus}"
+                    id="interviewStatus"
+                    required>
+
+                <option value="Not Scheduled">Not Scheduled</option>
+                <option value="Scheduled">Scheduled</option>
+
+            </select>
+
+            <span class="error"
+                  th:if="${#fields.hasErrors('interviewStatus')}"
+                  th:errors="*{interviewStatus}"></span>
+        </div>
+
+        <!-- Interview Date -->
+        <div class="field" id="interviewDateContainer">
+
+            <label>Interview Date</label>
+
+            <input type="date"
+                   th:field="*{interviewDate}"
+                   id="interviewDate">
+
+        </div>
+
+        <!-- Buttons -->
+        <div class="buttons">
+
+            <button type="submit">
+                Update Application
+            </button>
+
+            <a th:href="@{/}" class="cancel">
+                Cancel
+            </a>
+
+        </div>
+
+    </form>
+
+</div>
+
+<script>
+
+    // Interview date visibility
+    const interviewStatus =
+        document.getElementById("interviewStatus");
+
+    const interviewDateContainer =
+        document.getElementById("interviewDateContainer");
+
+    const interviewDate =
+        document.getElementById("interviewDate");
+
+    function updateInterviewDateField() {
+
+        const scheduled =
+            interviewStatus.value === "Scheduled";
+
+        interviewDateContainer.style.display =
+            scheduled ? "block" : "none";
+
+        interviewDate.disabled = !scheduled;
+        interviewDate.required = scheduled;
+
+        if (!scheduled) {
+            interviewDate.value = "";
+        }
+    }
+
+    interviewStatus.addEventListener(
+        "change", updateInterviewDateField
+    );
+
+    updateInterviewDateField();
+
+</script>
+
+</body>
+</html>

@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Job Tracker Dashboard</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 30px 15px;
+            font-family: Arial, sans-serif;
+            background: #f1f5f9;
+            color: #1e293b;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: auto;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        h1 {
+            color: #1e40af;
+            margin: 0;
+        }
+
+        .subtitle {
+            color: #64748b;
+            margin-top: 8px;
+        }
+
+        .dashboard {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 22px;
+            border-radius: 12px;
+            box-shadow: 0 3px 12px #0000000a;
+        }
+
+        .stat-card p {
+            color: #64748b;
+            margin: 0 0 12px;
+            font-size: 14px;
+        }
+
+        .stat-card h2 {
+            margin: 0;
+            font-size: 30px;
+        }
+
+        .blue { color: #2563eb; }
+        .orange { color: #d97706; }
+        .green { color: #16a34a; }
+        .red { color: #dc2626; }
+        .purple { color: #7c3aed; }
+
+        .card {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            box-shadow: 0 3px 12px #0000000a;
+        }
+
+        .card h2 {
+            margin-top: 0;
+            margin-bottom: 20px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 18px;
+        }
+
+        label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 7px;
+            font-size: 14px;
+        }
+
+        input:focus, select:focus {
+            outline: 2px solid #bfdbfe;
+            border-color: #2563eb;
+        }
+
+        button {
+            border: none;
+            border-radius: 7px;
+            padding: 11px 17px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            margin-top: 18px;
+        }
+
+        .add-btn {
+            background: #2563eb;
+            color: white;
+        }
+
+        .add-btn:hover {
+            background: #1d4ed8;
+        }
+
+        .edit-btn {
+            background: #16a34a;
+            color: white;
+            margin: 0 0 7px;
+        }
+
+        .delete-btn {
+            background: #dc2626;
+            color: white;
+            margin: 0;
+        }
+
+        .table-wrap {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 950px;
+        }
+
+        th, td {
+            text-align: left;
+            padding: 14px 10px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        th {
+            background: #eff6ff;
+            color: #1e40af;
+        }
+
+        .status {
+            display: inline-block;
+            padding: 6px 10px;
+            border-radius: 20px;
+            background: #dbeafe;
+            color: #1d4ed8;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .success {
+            color: #15803d;
+            background: #dcfce7;
+            padding: 12px;
+            border-radius: 7px;
+            margin-bottom: 20px;
+        }
+
+        .error {
+            color: #dc2626;
+            font-size: 13px;
+            margin-top: 5px;
+            display: block;
+        }
+
+        .empty {
+            text-align: center;
+            padding: 25px;
+            color: #64748b;
+        }
+
+        .toolbar {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .toolbar input {
+            max-width: 350px;
+        }
+
+        .toolbar select {
+            max-width: 220px;
+        }
+
+        @media (max-width: 900px) {
+            .dashboard {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        @media (max-width: 600px) {
+            .dashboard {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .card {
+                padding: 18px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <header>
+        <div>
+            <h1>Job Application Tracker</h1>
+            <p class="subtitle">
+                Track your job applications and interview progress.
+            </p>
+        </div>
+    </header>
+
+    <p class="success"
+       th:if="${message}"
+       th:text="${message}"></p>
+
+    <!-- Dashboard -->
+    <div class="dashboard">
+
+        <div class="stat-card">
+            <p>Total Applications</p>
+            <h2 class="blue" th:text="${totalApplications}">0</h2>
+        </div>
+
+        <div class="stat-card">
+            <p>Applied</p>
+            <h2 class="orange" th:text="${appliedCount}">0</h2>
+        </div>
+
+        <div class="stat-card">
+            <p>Interviews Scheduled</p>
+            <h2 class="purple" th:text="${interviewCount}">0</h2>
+        </div>
+
+        <div class="stat-card">
+            <p>Selected</p>
+            <h2 class="green" th:text="${selectedCount}">0</h2>
+        </div>
+
+        <div class="stat-card">
+            <p>Rejected</p>
+            <h2 class="red" th:text="${rejectedCount}">0</h2>
+        </div>
+
+    </div>
+
+    <!-- Add Application -->
+    <div class="card">
+
+        <h2>Add New Application</h2>
+
+        <form th:action="@{/applications/add}"
+              th:object="${application}"
+              method="post">
+
+            <div class="form-grid">
+
+                <!-- Company Name -->
+                <div>
+                    <label>Company Name</label>
+
+                    <input type="text"
+                           th:field="*{companyName}"
+                           placeholder="e.g. Zoho"
+                           required>
+
+                    <span class="error"
+                          th:if="${#fields.hasErrors('companyName')}"
+                          th:errors="*{companyName}"></span>
+                </div>
+
+                <!-- Job Role -->
+                <div>
+                    <label>Job Role</label>
+
+                    <input type="text"
+                           th:field="*{jobRole}"
+                           placeholder="e.g. Software Developer"
+                           required>
+
+                    <span class="error"
+                          th:if="${#fields.hasErrors('jobRole')}"
+                          th:errors="*{jobRole}"></span>
+                </div>
+
+                <!-- Application Date -->
+                <div>
+                    <label>Application Date</label>
+
+                    <input type="date"
+                           th:field="*{applicationDate}"
+                           required>
+
+                    <span class="error"
+                          th:if="${#fields.hasErrors('applicationDate')}"
+                          th:errors="*{applicationDate}"></span>
+                </div>
+
+                <!-- Application Status -->
+                <div>
+                    <label>Application Status</label>
+
+                    <select th:field="*{status}" required>
+                        <option value="">Select Status</option>
+                        <option value="Applied">Applied</option>
+                        <option value="1st Round">1st Round</option>
+                        <option value="2nd Round">2nd Round</option>
+                        <option value="3rd Round">3rd Round</option>
+                        <option value="4th Round">4th Round</option>
+                        <option value="5th Round">5th Round</option>
+                        <option value="Interview Scheduled">Interview Scheduled</option>
+                        <option value="Selected">Selected</option>
+                        <option value="Rejected">Rejected</option>
+                    </select>
+
+                    <span class="error"
+                          th:if="${#fields.hasErrors('status')}"
+                          th:errors="*{status}"></span>
+                </div>
+
+                <!-- Interview Status -->
+                <div>
+                    <label>Interview Schedule</label>
+
+                    <select th:field="*{interviewStatus}"
+                            id="interviewStatus"
+                            required>
+                        <option value="Not Scheduled">Not Scheduled</option>
+                        <option value="Scheduled">Scheduled</option>
+                    </select>
+
+                    <span class="error"
+                          th:if="${#fields.hasErrors('interviewStatus')}"
+                          th:errors="*{interviewStatus}"></span>
+                </div>
+
+                <!-- Interview Date -->
+                <div id="interviewDateContainer"
+                     style="display:none">
+
+                    <label>Interview Date</label>
+
+                    <input type="date"
+                           th:field="*{interviewDate}"
+                           id="interviewDate"
+                           disabled>
+                </div>
+
+            </div>
+
+            <button type="submit" class="add-btn">
+                + Add Application
+            </button>
+
+        </form>
+
+    </div>
+
+    <!-- Application List -->
+    <div class="card">
+
+        <h2>Your Applications</h2>
+
+        <div class="toolbar">
+
+            <input type="text"
+                   id="searchInput"
+                   placeholder="Search company or job role...">
+
+            <select id="statusFilter">
+                <option value="">All Statuses</option>
+                <option value="Applied">Applied</option>
+                <option value="1st Round">1st Round</option>
+                <option value="2nd Round">2nd Round</option>
+                <option value="3rd Round">3rd Round</option>
+                <option value="4th Round">4th Round</option>
+                <option value="5th Round">5th Round</option>
+                <option value="Interview Scheduled">Interview Scheduled</option>
+                <option value="Selected">Selected</option>
+                <option value="Rejected">Rejected</option>
+            </select>
+
+        </div>
+
+        <div class="table-wrap">
+
+            <table id="applicationsTable">
+
+                <thead>
+                    <tr>
+                        <th>Company</th>
+                        <th>Job Role</th>
+                        <th>Application Date</th>
+                        <th>Status</th>
+                        <th>Interview</th>
+                        <th>Interview Date</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    <tr th:if="${#lists.isEmpty(applications)}">
+                        <td colspan="7" class="empty">
+                            No applications saved yet.
+                        </td>
+                    </tr>
+
+                    <tr th:each="app : ${applications}"
+                        class="application-row">
+
+                        <td th:text="${app.companyName}"></td>
+                        <td th:text="${app.jobRole}"></td>
+                        <td th:text="${app.applicationDate}"></td>
+
+                        <td>
+                            <span class="status"
+                                  th:text="${app.status}"></span>
+                        </td>
+
+                        <td th:text="${app.interviewStatus}"></td>
+
+                        <td th:text="${app.interviewDate != null
+                            and !app.interviewDate.isEmpty()
+                            ? app.interviewDate : 'Not Scheduled'}"></td>
+
+                        <td>
+
+                            <a th:href="@{/applications/edit/{id}(id=${app.id})}">
+                                <button type="button" class="edit-btn">
+                                    Edit
+                                </button>
+                            </a>
+
+                            <form th:action="@{/applications/delete/{id}(id=${app.id})}"
+                                  method="post"
+                                  onsubmit="return confirm('Delete this application?');">
+
+                                <button type="submit" class="delete-btn">
+                                    Delete
+                                </button>
+
+                            </form>
+
+                        </td>
+
+                    </tr>
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+
+    // Interview date visibility
+    const interviewStatus =
+        document.getElementById("interviewStatus");
+
+    const interviewDateContainer =
+        document.getElementById("interviewDateContainer");
+
+    const interviewDate =
+        document.getElementById("interviewDate");
+
+    function updateInterviewDateField() {
+
+        const scheduled =
+            interviewStatus.value === "Scheduled";
+
+        interviewDateContainer.style.display =
+            scheduled ? "block" : "none";
+
+        interviewDate.disabled = !scheduled;
+        interviewDate.required = scheduled;
+
+        if (!scheduled) {
+            interviewDate.value = "";
+        }
+    }
+
+    interviewStatus.addEventListener(
+        "change", updateInterviewDateField
+    );
+
+    updateInterviewDateField();
+
+
+    // Search and status filter
+    const searchInput =
+        document.getElementById("searchInput");
+
+    const statusFilter =
+        document.getElementById("statusFilter");
+
+    function filterApplications() {
+
+        const searchValue =
+            searchInput.value.trim().toLowerCase();
+
+        const statusValue =
+            statusFilter.value.trim().toLowerCase();
+
+        const rows =
+            document.querySelectorAll(".application-row");
+
+        rows.forEach(row => {
+
+            const company =
+                row.cells[0].textContent.trim().toLowerCase();
+
+            const role =
+                row.cells[1].textContent.trim().toLowerCase();
+
+            const status =
+                row.cells[3].textContent.trim().replace(/\s+/g, " ").toLowerCase();
+
+            const interview =
+                row.cells[4].textContent.trim().toLowerCase();
+
+            const matchesSearch =
+                company.includes(searchValue) ||
+                role.includes(searchValue);
+
+            let matchesStatus = true;
+
+            if (statusValue !== "") {
+
+                if (statusValue === "interview scheduled") {
+                    matchesStatus = interview === "scheduled";
+                } else {
+                    matchesStatus = status === statusValue;
+                }
+            }
+
+            row.style.display =
+                matchesSearch && matchesStatus ? "" : "none";
+
+        });
+    }
+
+    searchInput.addEventListener("input", filterApplications);
+    statusFilter.addEventListener("change", filterApplications);
+
+</script>
+
+</body>
+</html>

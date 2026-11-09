@@ -1,92 +1,99 @@
-\# Java Job Application \& Interview Tracker
+# Job Application & Interview Tracker
 
+A Java-based web application built using Spring Boot that helps users manage job applications and track interview progress in one place.
 
+## Project Evolution
 
-\## Description
+This project was initially developed as a Java console application using JDBC and MySQL. It was later upgraded into a web application using Spring Boot, Spring Data JPA, Hibernate and Thymeleaf.
 
-A Java-based console application that helps users manage job applications and track interview details. It uses MySQL to store application information permanently.
+## Features
 
+- Add new job applications.
+- View all job applications.
+- Update application details.
+- Delete job applications.
+- Track application status from Applied to 5th Round.
+- Track interview status and interview dates.
+- Dashboard displaying application statistics.
+- Search applications by company name or job role.
+- Filter applications by status.
+- Form validation for required fields.
+- Store application information in MySQL.
 
+## Technologies Used
 
-\## Features
+- Java 17
+- Spring Boot
+- Spring MVC
+- Spring Data JPA
+- Hibernate
+- Thymeleaf
+- HTML and CSS
+- JavaScript
+- MySQL 8
+- Maven
+- Git and GitHub
 
-\- Add new job applications
+## Database Details
 
-\- View all applications
+- Database: `jobtracker`
+- Table: `job_applications`
+- Database connectivity: Spring Data JPA and Hibernate.
 
-\- Update application status and interview date
+## How to Run
 
-\- Delete job applications
+### Prerequisites
 
-\- Store application details in a MySQL database
+- JDK 17 or later
+- MySQL Server
+- Visual Studio Code or another Java IDE
 
-\- Perform CRUD operations using JDBC
+### 1. Clone the repository
 
+```bash
+git clone https://github.com/Vinusri-TRG/Java-Job-Application-Tracker.git
+```
 
+### 2. Create the database
 
-\## Technologies Used
+Open MySQL and execute:
 
-\- Java
+```sql
+CREATE DATABASE jobtracker;
+```
 
-\- Object-Oriented Programming (OOP)
+### 3. Configure database credentials
 
-\- JDBC
+Set your MySQL credentials as environment variables in PowerShell:
 
-\- MySQL
+```powershell
+$env:DB_USERNAME="root"
+$env:DB_PASSWORD="your_mysql_password"
+```
 
-\- MySQL Connector/J
+Replace the password with your actual MySQL password.
 
-\- Git
+### 4. Run the application
 
-\- GitHub
+Open the project folder in the terminal and execute:
 
+```powershell
+.\mvnw.cmd spring-boot:run
+```
 
+### 5. Open the application
 
-\## Database Details
+Visit:
 
-\- Database: `jobtracker`
+http://localhost:8080
 
-\- Table: `application`
+## Future Improvements
 
+- User login and authentication.
+- Online deployment.
+- Cloud database integration.
+- Additional dashboard features.
 
-
-\## How to Run
-
-1\. Install JDK and MySQL Server.
-
-2\. Create the `jobtracker` database and the required `application` table.
-
-3\. Set the `DB\_USERNAME` and `DB\_PASSWORD` environment variables.
-
-4\. Open PowerShell in the project folder.
-
-5\. Compile the Java files:
-
-
-
-&#x20;  `javac -cp ".;lib\\mysql-connector-j-26.7.0.jar" \*.java`
-
-
-
-6\. Run the application:
-
-
-
-&#x20;  `java -cp ".;lib\\mysql-connector-j-26.7.0.jar" TestApplication`
-
-
-
-\## Future Improvements
-
-\- Add a graphical user interface.
-
-\- Add search functionality.
-
-\- Develop a web application using Spring Boot.
-
-
-
-\## Author
+## Author
 
 B.Sc. Information Technology Student
-

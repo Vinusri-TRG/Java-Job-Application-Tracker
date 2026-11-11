@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
@@ -40,6 +41,27 @@
         .subtitle {
             color: #64748b;
             margin-top: 8px;
+        }
+
+        /* Logout button */
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logout-form {
+            margin: 0;
+        }
+
+        .logout-btn {
+            background: #dc2626;
+            color: white;
+            margin: 0;
+        }
+
+        .logout-btn:hover {
+            background: #b91c1c;
         }
 
         .dashboard {
@@ -235,12 +257,25 @@
 
 <div class="container">
 
+    <!-- Header with Logout button -->
     <header>
         <div>
             <h1>Job Application Tracker</h1>
             <p class="subtitle">
                 Track your job applications and interview progress.
             </p>
+        </div>
+
+        <div class="header-actions">
+            <form th:action="@{/logout}"
+                  method="post"
+                  class="logout-form">
+
+                <button type="submit" class="logout-btn">
+                    Logout
+                </button>
+
+            </form>
         </div>
     </header>
 
@@ -289,7 +324,6 @@
 
             <div class="form-grid">
 
-                <!-- Company Name -->
                 <div>
                     <label>Company Name</label>
 
@@ -303,7 +337,6 @@
                           th:errors="*{companyName}"></span>
                 </div>
 
-                <!-- Job Role -->
                 <div>
                     <label>Job Role</label>
 
@@ -317,7 +350,6 @@
                           th:errors="*{jobRole}"></span>
                 </div>
 
-                <!-- Application Date -->
                 <div>
                     <label>Application Date</label>
 
@@ -330,7 +362,6 @@
                           th:errors="*{applicationDate}"></span>
                 </div>
 
-                <!-- Application Status -->
                 <div>
                     <label>Application Status</label>
 
@@ -352,7 +383,6 @@
                           th:errors="*{status}"></span>
                 </div>
 
-                <!-- Interview Status -->
                 <div>
                     <label>Interview Schedule</label>
 
@@ -368,7 +398,6 @@
                           th:errors="*{interviewStatus}"></span>
                 </div>
 
-                <!-- Interview Date -->
                 <div id="interviewDateContainer"
                      style="display:none">
 

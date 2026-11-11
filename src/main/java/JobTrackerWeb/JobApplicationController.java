@@ -1,7 +1,10 @@
+
 package JobTrackerWeb;
 
 import jakarta.validation.Valid;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -9,6 +12,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
@@ -20,13 +24,12 @@ public class JobApplicationController {
         this.repository = repository;
     }
 
-    // Dashboard details
-    private void addDashboardDetails(Model model) {
+    // Dashboard details for logged-in user
+    private void addDashboardDetails(Model model, User currentUser) {
 
-        var applications = repository.findAll();
+        var applications = repository.findAllByUser(currentUser);
 
         model.addAttribute("applications", applications);
-
         model.addAttribute("totalApplications", applications.size());
 
         model.addAttribute("appliedCount",
@@ -52,33 +55,36 @@ public class JobApplicationController {
 
     // Display homepage
     @GetMapping("/")
-    public String home(Model model) {
+    public String home(
+            Model model,
+            @AuthenticationPrincipal User currentUser) {
 
         model.addAttribute("application", new JobApplication());
 
-        addDashboardDetails(model);
+        addDashboardDetails(model, currentUser);
 
         return "index";
     }
 
-    // Add new application with validation
+    // Add application
     @PostMapping("/applications/add")
     public String addApplication(
             @Valid @ModelAttribute("application") JobApplication application,
             BindingResult result,
             Model model,
-            RedirectAttributes redirectAttributes) {
+            RedirectAttributes redirectAttributes,
+            @AuthenticationPrincipal User currentUser) {
 
         if (result.hasErrors()) {
-
-            addDashboardDetails(model);
-
+            addDashboardDetails(model, currentUser);
             return "index";
         }
 
         if ("Not Scheduled".equals(application.getInterviewStatus())) {
             application.setInterviewDate(null);
         }
+
+        application.setUser(currentUser);
 
         repository.save(application);
 
@@ -92,9 +98,14 @@ public class JobApplicationController {
     @PostMapping("/applications/delete/{id}")
     public String deleteApplication(
             @PathVariable Long id,
+            @AuthenticationPrincipal User currentUser,
             RedirectAttributes redirectAttributes) {
 
-        repository.deleteById(id);
+        JobApplication application = repository.findByIdAndUser(id, currentUser)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND, "Application not found"));
+
+        repository.delete(application);
 
         redirectAttributes.addFlashAttribute(
                 "message", "Application deleted successfully!");
@@ -106,11 +117,12 @@ public class JobApplicationController {
     @GetMapping("/applications/edit/{id}")
     public String editApplication(
             @PathVariable Long id,
-            Model model) {
+            Model model,
+            @AuthenticationPrincipal User currentUser) {
 
-        JobApplication application = repository.findById(id)
-                .orElseThrow(() ->
-                        new RuntimeException("Application not found"));
+        JobApplication application = repository.findByIdAndUser(id, currentUser)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND, "Application not found"));
 
         model.addAttribute("application", application);
         model.addAttribute("applicationId", id);
@@ -118,50 +130,35 @@ public class JobApplicationController {
         return "edit";
     }
 
-    // Update existing application with validation
+    // Update application
     @PostMapping("/applications/update/{id}")
     public String updateApplication(
             @PathVariable Long id,
             @Valid @ModelAttribute("application") JobApplication updatedApplication,
             BindingResult result,
             Model model,
-            RedirectAttributes redirectAttributes) {
+            RedirectAttributes redirectAttributes,
+            @AuthenticationPrincipal User currentUser) {
+
+        JobApplication existingApplication = repository.findByIdAndUser(id, currentUser)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND, "Application not found"));
 
         if (result.hasErrors()) {
-
             model.addAttribute("applicationId", id);
-
             return "edit";
         }
 
-        JobApplication existingApplication = repository.findById(id)
-                .orElseThrow(() ->
-                        new RuntimeException("Application not found"));
+        existingApplication.setCompanyName(updatedApplication.getCompanyName());
+        existingApplication.setJobRole(updatedApplication.getJobRole());
+        existingApplication.setApplicationDate(updatedApplication.getApplicationDate());
+        existingApplication.setStatus(updatedApplication.getStatus());
+        existingApplication.setInterviewStatus(updatedApplication.getInterviewStatus());
 
-        existingApplication.setCompanyName(
-                updatedApplication.getCompanyName());
-
-        existingApplication.setJobRole(
-                updatedApplication.getJobRole());
-
-        existingApplication.setApplicationDate(
-                updatedApplication.getApplicationDate());
-
-        existingApplication.setStatus(
-                updatedApplication.getStatus());
-
-        existingApplication.setInterviewStatus(
-                updatedApplication.getInterviewStatus());
-
-        if ("Not Scheduled".equals(
-                updatedApplication.getInterviewStatus())) {
-
+        if ("Not Scheduled".equals(updatedApplication.getInterviewStatus())) {
             existingApplication.setInterviewDate(null);
-
         } else {
-
-            existingApplication.setInterviewDate(
-                    updatedApplication.getInterviewDate());
+            existingApplication.setInterviewDate(updatedApplication.getInterviewDate());
         }
 
         repository.save(existingApplication);
@@ -170,12 +167,5 @@ public class JobApplicationController {
                 "message", "Application updated successfully!");
 
         return "redirect:/";
-    }
-
-    // Temporary test URL
-    @GetMapping("/test")
-    public String testPage() {
-
-        return "index";
     }
 }
